@@ -1,6 +1,9 @@
 syntax = "proto3";
 option go_package = "hahiye";
 
+// imports
+import "google/protobuf/timestamp.proto";
+
 // Hahiye Service
 //
 // Hahiye Service API consists of a multiple service which returns their  messages.
@@ -59,7 +62,7 @@ message Account {
     string email = 5;
     string profile_url = 6;
     bool verified = 7;
-    string created_at = 8;
+    google.protobuf.Timestamp created_at = 8;
 }
 
 // PlaceService
@@ -81,7 +84,7 @@ message Place {
     string description = 6;
     string contact = 7;
     bool verified = 9;
-    string created_at = 8;
+    google.protobuf.Timestamp created_at = 8;
 }
 
 message Places {
