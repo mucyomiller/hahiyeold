@@ -1,0 +1,64 @@
+syntax = "proto3";
+option go_package = "hahiye";
+
+// Hahiye Service
+//
+// Hahiye Service API consists of a multiple service which returns their  messages.
+// We will decouple Individual service in future
+package hahiye;
+
+
+// StatusResponse represent response from service and their description
+message StatusResponse {
+    string status_code = 1;
+    string message = 2;
+}
+
+// ReqById helps to query using id of resource
+message ReqById {
+    string id = 1;
+}
+
+// AccountService
+service AccountService {
+    rpc CreateAccount (Account) returns (StatusResponse);
+    rpc DeleteAccount (ReqById) returns (StatusResponse);
+    rpc GetAccount (ReqById) returns (Account);
+}
+
+// Account represent Account model and its properties
+message Account {
+    string id = 1;
+    string name = 2;
+    string username = 3;
+    string password = 4;
+    string email = 5;
+    string profile_url = 6;
+    bool verified = 7;
+    string created_at = 8;
+}
+
+// PlaceService
+service PlaceService {
+    rpc AddService (Place) returns (StatusResponse);
+    rpc DeletePlace (ReqById) returns (StatusResponse);
+    rpc GetPlace (ReqById) returns (Place);
+    rpc GetPlaceByName (PlaceName) returns (Place);
+}
+
+// Place represent Place model and its properties
+message Place {
+    string id = 1;
+    string name = 2;
+    string featured = 3;
+    string website = 4;
+    string tagline = 5;
+    string description = 6;
+    string contact = 7;
+    bool verified = 9;
+    string created_at = 8;
+}
+
+message PlaceName {
+    string name = 1;
+}
