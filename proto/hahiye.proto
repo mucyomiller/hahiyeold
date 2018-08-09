@@ -8,6 +8,8 @@ option go_package = "hahiye";
 package hahiye;
 
 
+// creating common message type used by varies services
+// 
 // StatusResponse represent response from service and their description
 message StatusResponse {
     string status_code = 1;
@@ -17,6 +19,10 @@ message StatusResponse {
 // ReqById helps to query using id of resource
 message ReqById {
     string id = 1;
+}
+
+// void message
+message Void {
 }
 
 // AccountService
@@ -44,6 +50,7 @@ service PlaceService {
     rpc DeletePlace (ReqById) returns (StatusResponse);
     rpc GetPlace (ReqById) returns (Place);
     rpc GetPlaceByName (PlaceName) returns (Place);
+    rpc GetPlaces (Void) returns (stream Places);
 }
 
 // Place represent Place model and its properties
@@ -59,6 +66,34 @@ message Place {
     string created_at = 8;
 }
 
+message Places {
+    repeated Place places = 1;
+}
+
 message PlaceName {
     string name = 1;
 }
+
+// InterestService
+service InterestService {
+    rpc AddInterest (Interest) returns (StatusResponse);
+    rpc Removeinterest (ReqById) returns (StatusResponse);
+    rpc GetInterest (ReqById) returns (Interest);
+    rpc GetInterestByName (InterestName) returns (Interest);
+    rpc GetInterests (Void) returns (stream Interests);
+}
+
+
+message Interest {
+    string id = 1;
+    string name = 2;
+}
+
+message Interests {
+    repeated Interest interests = 1;
+}
+
+message InterestName {
+    string name = 1;
+}
+
