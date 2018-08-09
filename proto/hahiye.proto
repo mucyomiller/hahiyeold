@@ -25,6 +25,24 @@ message ReqById {
 message Void {
 }
 
+// Authentication Service
+// 
+// AuthRequest
+message AuthRequest{
+    string username = 1;
+    string password = 2;
+}
+
+// AuthResponse
+message AuthResponse {
+    string token = 1;
+}
+
+// AuthService
+service AuthService {
+    rpc Login(AuthRequest) returns (AuthResponse){}
+}
+
 // AccountService
 service AccountService {
     rpc CreateAccount (Account) returns (StatusResponse);
