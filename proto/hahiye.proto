@@ -15,14 +15,6 @@ import "google/protobuf/empty.proto";
 package hahiye;
 
 
-// creating common message type used by varies services
-// 
-// StatusResponse represent response from service and their description
-message StatusResponse {
-    string status_code = 1;
-    string message = 2;
-}
-
 // Authentication Service
 // 
 // AuthRequest
@@ -43,8 +35,8 @@ service AuthService {
 
 // AccountService
 service AccountService {
-    rpc CreateAccount (Account) returns (StatusResponse);
-    rpc DeleteAccount (AccountRequest) returns (StatusResponse);
+    rpc CreateAccount (Account) returns (Account);
+    rpc DeleteAccount (AccountRequest) returns (google.protobuf.Empty);
     rpc GetAccount (AccountRequest) returns (Account);
 }
 
@@ -67,8 +59,8 @@ message AccountRequest {
 
 // PlaceService
 service PlaceService {
-    rpc AddService (Place) returns (StatusResponse);
-    rpc DeletePlace (PlaceRequest) returns (StatusResponse);
+    rpc AddPlace (Place) returns (Place);
+    rpc DeletePlace (PlaceRequest) returns (google.protobuf.Empty);
     rpc GetPlace (PlaceRequest) returns (Place);
     rpc GetPlaces (google.protobuf.Empty) returns (stream Places);
 }
@@ -97,8 +89,8 @@ message PlaceRequest {
 
 // InterestService
 service InterestService {
-    rpc AddInterest (Interest) returns (StatusResponse);
-    rpc Removeinterest (InterestRequest) returns (StatusResponse);
+    rpc AddInterest (Interest) returns (Interest);
+    rpc Removeinterest (InterestRequest) returns (google.protobuf.Empty);
     rpc GetInterest (InterestRequest) returns (Interest);
     rpc GetInterests (google.protobuf.Empty) returns (stream Interests);
 }
