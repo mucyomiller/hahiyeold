@@ -1,8 +1,12 @@
 syntax = "proto3";
 option go_package = "hahiye";
+option java_package = "rw.hahiye.hahiye";
+option java_outer_classname = "Hahiye";
+option java_multiple_files = true;
 
 // imports
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 
 // Hahiye Service
 //
@@ -17,15 +21,6 @@ package hahiye;
 message StatusResponse {
     string status_code = 1;
     string message = 2;
-}
-
-// ReqById helps to query using id of resource
-message ReqById {
-    string id = 1;
-}
-
-// void message
-message Void {
 }
 
 // Authentication Service
@@ -49,8 +44,8 @@ service AuthService {
 // AccountService
 service AccountService {
     rpc CreateAccount (Account) returns (StatusResponse);
-    rpc DeleteAccount (ReqById) returns (StatusResponse);
-    rpc GetAccount (ReqById) returns (Account);
+    rpc DeleteAccount (AccountRequest) returns (StatusResponse);
+    rpc GetAccount (AccountRequest) returns (Account);
 }
 
 // Account represent Account model and its properties
@@ -65,13 +60,17 @@ message Account {
     google.protobuf.Timestamp created_at = 8;
 }
 
+message AccountRequest {
+    string id = 1;
+    string name = 2;
+}
+
 // PlaceService
 service PlaceService {
     rpc AddService (Place) returns (StatusResponse);
-    rpc DeletePlace (ReqById) returns (StatusResponse);
-    rpc GetPlace (ReqById) returns (Place);
-    rpc GetPlaceByName (PlaceName) returns (Place);
-    rpc GetPlaces (Void) returns (stream Places);
+    rpc DeletePlace (PlaceRequest) returns (StatusResponse);
+    rpc GetPlace (PlaceRequest) returns (Place);
+    rpc GetPlaces (google.protobuf.Empty) returns (stream Places);
 }
 
 // Place represent Place model and its properties
@@ -91,17 +90,17 @@ message Places {
     repeated Place places = 1;
 }
 
-message PlaceName {
-    string name = 1;
+message PlaceRequest {
+    string id = 1;
+    string name = 2;
 }
 
 // InterestService
 service InterestService {
     rpc AddInterest (Interest) returns (StatusResponse);
-    rpc Removeinterest (ReqById) returns (StatusResponse);
-    rpc GetInterest (ReqById) returns (Interest);
-    rpc GetInterestByName (InterestName) returns (Interest);
-    rpc GetInterests (Void) returns (stream Interests);
+    rpc Removeinterest (InterestRequest) returns (StatusResponse);
+    rpc GetInterest (InterestRequest) returns (Interest);
+    rpc GetInterests (google.protobuf.Empty) returns (stream Interests);
 }
 
 
@@ -114,7 +113,8 @@ message Interests {
     repeated Interest interests = 1;
 }
 
-message InterestName {
-    string name = 1;
+message InterestRequest {
+    string id = 1;
+    string name = 2;
 }
 
