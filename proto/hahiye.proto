@@ -38,6 +38,7 @@ service AccountService {
     rpc CreateAccount (Account) returns (Account);
     rpc DeleteAccount (AccountRequest) returns (google.protobuf.Empty);
     rpc GetAccount (AccountRequest) returns (Account);
+    rpc UpdateAccount (Account) returns (AccountResponse);
 }
 
 // Account represent Account model and its properties
@@ -57,12 +58,18 @@ message AccountRequest {
     string name = 2;
 }
 
+message AccountResponse {
+    string id = 1;
+    string name = 2;
+}
+
 // PlaceService
 service PlaceService {
     rpc AddPlace (Place) returns (Place);
     rpc DeletePlace (PlaceRequest) returns (google.protobuf.Empty);
     rpc GetPlace (PlaceRequest) returns (Place);
     rpc GetPlaces (google.protobuf.Empty) returns (stream Places);
+    rpc UpdatePlace (Place) returns (Place);
 }
 
 // Place represent Place model and its properties
@@ -75,7 +82,15 @@ message Place {
     string description = 6;
     string contact = 7;
     bool verified = 9;
+    Location location = 10;
+    string amenity = 11;
     google.protobuf.Timestamp created_at = 8;
+}
+
+// Location message
+message Location {
+    string latitude = 1;
+    string longitude = 2;
 }
 
 message Places {
@@ -93,6 +108,7 @@ service InterestService {
     rpc Removeinterest (InterestRequest) returns (google.protobuf.Empty);
     rpc GetInterest (InterestRequest) returns (Interest);
     rpc GetInterests (google.protobuf.Empty) returns (stream Interests);
+    rpc UpdateInterest (Interest) returns (InterestResponse);
 }
 
 
@@ -110,3 +126,7 @@ message InterestRequest {
     string name = 2;
 }
 
+message InterestResponse {
+    string id = 1;
+    string name = 2;
+}
