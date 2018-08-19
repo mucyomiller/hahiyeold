@@ -59,7 +59,7 @@ func (p *PlaceService) GetPlace(context.Context, *pb.PlaceRequest) (*pb.Place, e
 	return &pb.Place{}, nil
 }
 
-// GetPlaces returns infos of available places
+// GetPlaces stream available places
 func (p *PlaceService) GetPlaces(*empty.Empty, pb.PlaceService_GetPlacesServer) error {
 	return nil
 }
@@ -67,4 +67,37 @@ func (p *PlaceService) GetPlaces(*empty.Empty, pb.PlaceService_GetPlacesServer) 
 // UpdatePlace update info about specified place
 func (p *PlaceService) UpdatePlace(context.Context, *pb.Place) (*pb.Place, error) {
 	return &pb.Place{}, nil
+}
+
+// InterestService implements the pb InterestServiceServer  interface
+type InterestService struct{}
+
+// NewInterestServiceServer create instance of InterestService
+func NewInterestServiceServer() pb.InterestServiceServer {
+	return new(InterestService)
+}
+
+// AddInterest adds new Interest
+func (i *InterestService) AddInterest(context.Context, *pb.Interest) (*pb.Interest, error) {
+	return &pb.Interest{}, nil
+}
+
+// Removeinterest specified Interest
+func (i *InterestService) Removeinterest(context.Context, *pb.InterestRequest) (*empty.Empty, error) {
+	return &empty.Empty{}, nil
+}
+
+// GetInterest specified Interest
+func (i *InterestService) GetInterest(context.Context, *pb.InterestRequest) (*pb.Interest, error) {
+	return &pb.Interest{}, nil
+}
+
+// GetInterests stream available Interests
+func (i *InterestService) GetInterests(*empty.Empty, pb.InterestService_GetInterestsServer) error {
+	return nil
+}
+
+// UpdateInterest update specified Interest
+func (i *InterestService) UpdateInterest(context.Context, *pb.Interest) (*pb.InterestResponse, error) {
+	return &pb.InterestResponse{}, nil
 }
