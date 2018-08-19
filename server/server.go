@@ -143,7 +143,7 @@ func (s *AuthService) Login(ctx context.Context, req *pb.AuthRequest) (*pb.AuthR
 	}
 
 	if req.GetUsername() != username {
-		log.Println("missing uname")
+		log.Println("missing username")
 		return nil, status.Error(codes.PermissionDenied, "invalid user")
 	}
 
