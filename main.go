@@ -90,6 +90,11 @@ func streamAuthIntercept(
 	info *grpc.StreamServerInfo,
 	handler grpc.StreamHandler,
 ) error {
+	//bypass auth if method is /hahiye.AuthService/Login
+	if info.FullMethod == "/hahiye.AuthService/Login" {
+		fmt.Println("bypassing auth cz it's login action")
+		return handler(server, stream)
+	}
 	if err := auth(stream.Context()); err != nil {
 		return err
 	}
