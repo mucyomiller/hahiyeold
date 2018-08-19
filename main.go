@@ -71,6 +71,11 @@ func authUnaryIntercept(
 	info *grpc.UnaryServerInfo,
 	handler grpc.UnaryHandler,
 ) (resp interface{}, err error) {
+	//bypass auth if method is /hahiye.AuthService/Login
+	if info.FullMethod == "/hahiye.AuthService/Login" {
+		fmt.Println("bypassing auth cz it's login action")
+		return handler(ctx, req)
+	}
 	if err := auth(ctx); err != nil {
 		return nil, err
 	}
