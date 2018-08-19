@@ -2,9 +2,15 @@ package server
 
 import (
 	"context"
+	"log"
+	"time"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/golang/protobuf/ptypes/empty"
 	pb "github.com/mucyomiller/hahiye/hahiye"
+	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // AccountService implements the pb AccountServiceServer  interface
@@ -100,4 +106,75 @@ func (i *InterestService) GetInterests(*empty.Empty, pb.InterestService_GetInter
 // UpdateInterest update specified Interest
 func (i *InterestService) UpdateInterest(context.Context, *pb.Interest) (*pb.InterestResponse, error) {
 	return &pb.InterestResponse{}, nil
+}
+
+type user struct {
+	username string
+	password []byte
+}
+
+// AuthService implement AuthServiceServer
+type AuthService struct {
+	*user
+}
+
+// NewAuthService returns *AuthService
+func NewAuthService() *AuthService {
+	return new(AuthService)
+}
+
+// Login credentials are stored in dgraph
+// username and hashed password.
+func (s *AuthService) Login(ctx context.Context, req *pb.AuthRequest) (*pb.AuthResponse, error) {
+	log.Println("Authorizing user", req.GetUsername())
+	if req.GetUsername() == "" || req.GetPassword() == "" {
+		log.Println("Auth failed for user", req.GetUsername())
+		return nil, status.Errorf(codes.InvalidArgument, "missing username or password")
+	}
+	// query dgraph here
+	// temporary mocks user credentials
+	secret := "s3cr3t"
+	name := "Mucyo Miller"
+	username := "miller"
+	password := "miller"
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.GetUsername() != username {
+		log.Println("missing uname")
+		return nil, status.Error(codes.PermissionDenied, "invalid user")
+	}
+
+	if err := bcrypt.CompareHashAndPassword(hash, []byte(req.GetPassword())); err != nil {
+		log.Println("auth failed")
+		return nil, status.Error(codes.PermissionDenied, "auth failed")
+	}
+
+	// create jwt token
+	// see reserved claims https://tools.ietf.org/html/rfc7519#section-4.1
+	// see jwt example here https://godoc.org/github.com/dgrijalva/jwt-go#example-New--Hmac
+	token := jwt.NewWithClaims(
+		jwt.SigningMethodHS256,
+		jwt.MapClaims{
+			"exp":  time.Now().Add(time.Minute * 20).Unix(),
+			"sub":  username,
+			"iss":  "authservice",
+			"aud":  "user",
+			"name": name,
+		},
+	)
+
+	// this example uses a simple string secret. You can also
+	// use JWT package to specify an RSA public cert here as well.
+	tokenString, err := token.SignedString([]byte(secret))
+
+	if err != nil {
+		log.Println(err)
+		return nil, status.Error(codes.Internal, "internal login problem")
+	}
+
+	log.Printf("User %s logged in OK, JWT token: %s\n", username, tokenString)
+	return &pb.AuthResponse{Token: tokenString}, nil
 }
