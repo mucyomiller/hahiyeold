@@ -95,7 +95,7 @@ func (i *InterestService) Removeinterest(context.Context, *pb.InterestRequest) (
 
 // GetInterest specified Interest
 func (i *InterestService) GetInterest(context.Context, *pb.InterestRequest) (*pb.Interest, error) {
-	return &pb.Interest{}, nil
+	return &pb.Interest{Id: "1", Name: "chips"}, nil
 }
 
 // GetInterests stream available Interests
