@@ -4,18 +4,62 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	pb "github.com/mucyomiller/hahiye/hahiye"
+	"github.com/mucyomiller/hahiye/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
+const (
+	port        = ":9090"
+	srvCertFile = "./certs/server.crt"
+	srvKeyFile  = "./certs/server.key"
+)
+
 func main() {
-	fmt.Println("gprc service...")
-	_ = &pb.Place{}
+
+	// creating a listener on specified port
+	listener, err := net.Listen("tcp", port)
+	if err != nil {
+		log.Fatal("failed to start server:", err)
+	}
+
+	fmt.Println("starting gprc server...")
+
+	// creating tls credentials from cert file
+	tlsCreds, err := credentials.NewServerTLSFromFile(srvCertFile, srvKeyFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// setup and register our available services
+	authService := server.NewAuthService()
+	accountService := server.NewAccountServiceServer()
+	placeService := server.NewPlaceServiceServer()
+	interestService := server.NewInterestServiceServer()
+
+	grpcServer := grpc.NewServer(
+		grpc.Creds(tlsCreds),
+		grpc.UnaryInterceptor(authUnaryIntercept),
+		grpc.StreamInterceptor(streamAuthIntercept),
+	)
+
+	pb.RegisterAuthServiceServer(grpcServer, authService)
+	pb.RegisterAccountServiceServer(grpcServer, accountService)
+	pb.RegisterPlaceServiceServer(grpcServer, placeService)
+	pb.RegisterInterestServiceServer(grpcServer, interestService)
+
+	// start services server
+	log.Println("starting secure rpc services on", port)
+	if err := grpcServer.Serve(listener); err != nil {
+		log.Fatal(err)
+	}
 
 }
 
