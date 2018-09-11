@@ -19,7 +19,7 @@ import (
 const (
 	port        = ":9090"
 	srvCertFile = "./certs/server.crt"
-	srvKeyFile  = "./certs/server.key"
+	srvKeyFile  = "./certs/ca-key.pem"
 )
 
 func main() {
