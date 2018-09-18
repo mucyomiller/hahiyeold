@@ -115,6 +115,7 @@ service InterestService {
 message Interest {
     string id = 1;
     string name = 2;
+    string  featured = 3;
 }
 
 message Interests {
