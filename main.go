@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
+	"os/signal"
 
 	"github.com/dgraph-io/dgo"
 	"github.com/dgraph-io/dgo/protos/api"
@@ -84,6 +86,20 @@ func main() {
 	pb.RegisterAccountServiceServer(grpcServer, accountService)
 	pb.RegisterPlaceServiceServer(grpcServer, placeService)
 	pb.RegisterInterestServiceServer(grpcServer, interestService)
+
+	// graceful shutdown
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		for range c {
+			// sig is a ^C, handle it
+			log.Println("shutting down gRPC server...")
+
+			grpcServer.GracefulStop()
+
+			<-ctx.Done()
+		}
+	}()
 
 	// start services server
 	log.Println("starting secure rpc services on", port)
