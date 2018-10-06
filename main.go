@@ -6,6 +6,8 @@ import (
 	"log"
 	"net"
 
+	"github.com/dgraph-io/dgo"
+	"github.com/dgraph-io/dgo/protos/api"
 	jwt "github.com/dgrijalva/jwt-go"
 	pb "github.com/mucyomiller/hahiye/hahiye"
 	"github.com/mucyomiller/hahiye/server"
@@ -24,6 +26,34 @@ const (
 
 func main() {
 
+	//spin up dgraph db connection
+	conn, err := grpc.Dial("127.0.0.1:9080", grpc.WithInsecure())
+	if err != nil {
+		log.Fatal("While trying to dial gRPC")
+		return
+	}
+	fmt.Println("Now Connected to DgraphDB")
+	defer conn.Close()
+	dc := api.NewDgraphClient(conn)
+	dg := dgo.NewDgraphClient(dc)
+	op := &api.Operation{}
+	// Adding Our Defined  Database SCHEMA
+	op.Schema = `
+	location: geo @index(geo) .
+	name: string @index(term) .
+	lastname: string @index(term) .
+	password: password .
+	name: string @index(term) .
+	follows: uid @reverse .
+	interested: uid @reverse .
+	verified: bool .
+	`
+	ctx := context.Background()
+	err = dg.Alter(ctx, op)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// creating a listener on specified port
 	listener, err := net.Listen("tcp", port)
 	if err != nil {
@@ -39,10 +69,10 @@ func main() {
 	}
 
 	// setup and register our available services
-	authService := server.NewAuthService()
-	accountService := server.NewAccountServiceServer()
-	placeService := server.NewPlaceServiceServer()
-	interestService := server.NewInterestServiceServer()
+	authService := server.NewAuthService(dg)
+	accountService := server.NewAccountServiceServer(dg)
+	placeService := server.NewPlaceServiceServer(dg)
+	interestService := server.NewInterestServiceServer(dg)
 
 	grpcServer := grpc.NewServer(
 		grpc.Creds(tlsCreds),

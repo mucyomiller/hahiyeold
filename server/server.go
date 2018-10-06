@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/dgraph-io/dgo"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/golang/protobuf/ptypes/empty"
 	pb "github.com/mucyomiller/hahiye/hahiye"
@@ -14,11 +15,13 @@ import (
 )
 
 // AccountService implements the pb AccountServiceServer  interface
-type AccountService struct{}
+type AccountService struct {
+	db *dgo.Dgraph
+}
 
 // NewAccountServiceServer create instance of AccountService
-func NewAccountServiceServer() pb.AccountServiceServer {
-	return new(AccountService)
+func NewAccountServiceServer(db *dgo.Dgraph) pb.AccountServiceServer {
+	return &AccountService{db: db}
 }
 
 // CreateAccount used to create new user account
@@ -43,11 +46,13 @@ func (a *AccountService) UpdateAccount(context.Context, *pb.Account) (*pb.Accoun
 }
 
 // PlaceService implements the pb PlaceServiceServer  interface
-type PlaceService struct{}
+type PlaceService struct {
+	db *dgo.Dgraph
+}
 
 // NewPlaceServiceServer create instance of PlaceService
-func NewPlaceServiceServer() pb.PlaceServiceServer {
-	return new(PlaceService)
+func NewPlaceServiceServer(db *dgo.Dgraph) pb.PlaceServiceServer {
+	return &PlaceService{db: db}
 }
 
 // AddPlace adds new place
@@ -76,11 +81,13 @@ func (p *PlaceService) UpdatePlace(context.Context, *pb.Place) (*pb.Place, error
 }
 
 // InterestService implements the pb InterestServiceServer  interface
-type InterestService struct{}
+type InterestService struct {
+	db *dgo.Dgraph
+}
 
 // NewInterestServiceServer create instance of InterestService
-func NewInterestServiceServer() pb.InterestServiceServer {
-	return new(InterestService)
+func NewInterestServiceServer(db *dgo.Dgraph) pb.InterestServiceServer {
+	return &InterestService{db: db}
 }
 
 // AddInterest adds new Interest
@@ -115,12 +122,12 @@ type user struct {
 
 // AuthService implement AuthServiceServer
 type AuthService struct {
-	*user
+	db *dgo.Dgraph
 }
 
 // NewAuthService returns *AuthService
-func NewAuthService() *AuthService {
-	return new(AuthService)
+func NewAuthService(db *dgo.Dgraph) *AuthService {
+	return &AuthService{db: db}
 }
 
 // Login credentials are stored in dgraph
