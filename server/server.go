@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/golang/protobuf/ptypes/empty"
 	pb "github.com/mucyomiller/hahiye/hahiye"
+	"github.com/mucyomiller/hahiye/model"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -101,8 +103,32 @@ func (i *InterestService) Removeinterest(context.Context, *pb.InterestRequest) (
 }
 
 // GetInterest specified Interest
-func (i *InterestService) GetInterest(context.Context, *pb.InterestRequest) (*pb.Interest, error) {
-	return &pb.Interest{Id: "1", Name: "chips"}, nil
+func (i *InterestService) GetInterest(ctx context.Context, req *pb.InterestRequest) (*pb.Interest, error) {
+	resp, err := i.db.NewTxn().QueryWithVars(context.Background(),
+		`query interest($id: string = "0", $name: string = "") {
+			interest(func: has(interest)) @filter(uid($id) OR allofterms(name, $name)) {
+				interest
+				uid
+				name
+			}
+		  }`, map[string]string{"$id": req.GetId(), "$name": req.GetName()})
+
+	if err != nil {
+		//TODO: return grpc error
+		log.Fatal(err)
+	}
+
+	// InterestResp to hold Interest response
+	type InterestResp struct {
+		Interest []model.Interest
+	}
+	data := InterestResp{}
+	// Unmarshal this form {"interest":[{"interest":"","uid":"0x1","name":"chips"}]}
+	json.Unmarshal(resp.Json, &data)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &pb.Interest{Id: data.Interest[0].UID, Name: data.Interest[1].Name}, nil
 }
 
 // GetInterests stream available Interests
