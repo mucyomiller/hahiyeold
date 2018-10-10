@@ -128,7 +128,7 @@ func (i *InterestService) GetInterest(ctx context.Context, req *pb.InterestReque
 	if err != nil {
 		log.Fatal(err)
 	}
-	return &pb.Interest{Id: data.Interest[0].UID, Name: data.Interest[1].Name}, nil
+	return &pb.Interest{Id: data.Interest[0].UID, Name: data.Interest[0].Name}, nil
 }
 
 // GetInterests stream available Interests
