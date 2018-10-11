@@ -104,7 +104,7 @@ func (i *InterestService) Removeinterest(context.Context, *pb.InterestRequest) (
 
 // GetInterest specified Interest
 func (i *InterestService) GetInterest(ctx context.Context, req *pb.InterestRequest) (*pb.Interest, error) {
-	resp, err := i.db.NewTxn().QueryWithVars(context.Background(),
+	resp, err := i.db.NewTxn().QueryWithVars(ctx,
 		`query interest($id: string = "0", $name: string = "") {
 			interest(func: has(interest)) @filter(uid($id) OR allofterms(name, $name)) {
 				interest
@@ -115,7 +115,9 @@ func (i *InterestService) GetInterest(ctx context.Context, req *pb.InterestReque
 
 	if err != nil {
 		//TODO: return grpc error
-		log.Fatal(err)
+		return nil, status.Errorf(
+			codes.InvalidArgument, err.Error(),
+		)
 	}
 
 	// InterestResp to hold Interest response
@@ -126,7 +128,9 @@ func (i *InterestService) GetInterest(ctx context.Context, req *pb.InterestReque
 	// Unmarshal this form {"interest":[{"interest":"","uid":"0x1","name":"chips"}]}
 	json.Unmarshal(resp.Json, &data)
 	if err != nil {
-		log.Fatal(err)
+		return nil, status.Errorf(
+			codes.Unknown, err.Error(),
+		)
 	}
 	return &pb.Interest{Id: data.Interest[0].UID, Name: data.Interest[0].Name}, nil
 }
