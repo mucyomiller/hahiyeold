@@ -107,7 +107,7 @@ service InterestService {
     rpc AddInterest (Interest) returns (Interest);
     rpc Removeinterest (InterestRequest) returns (google.protobuf.Empty);
     rpc GetInterest (InterestRequest) returns (Interest);
-    rpc GetInterests (google.protobuf.Empty) returns (stream Interests);
+    rpc GetInterests (google.protobuf.Empty) returns (stream Interest);
     rpc UpdateInterest (Interest) returns (InterestResponse);
 }
 
