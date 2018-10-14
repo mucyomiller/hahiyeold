@@ -126,7 +126,7 @@ func (i *InterestService) GetInterest(ctx context.Context, req *pb.InterestReque
 	}
 	data := InterestResp{}
 	// Unmarshal this form {"interest":[{"interest":"","uid":"0x1","name":"chips"}]}
-	json.Unmarshal(resp.Json, &data)
+	err = json.Unmarshal(resp.Json, &data)
 	if err != nil {
 		return nil, status.Errorf(
 			codes.Unknown, err.Error(),
@@ -136,7 +136,38 @@ func (i *InterestService) GetInterest(ctx context.Context, req *pb.InterestReque
 }
 
 // GetInterests stream available Interests
-func (i *InterestService) GetInterests(*empty.Empty, pb.InterestService_GetInterestsServer) error {
+func (i *InterestService) GetInterests(empty *empty.Empty, stream pb.InterestService_GetInterestsServer) error {
+	resp, err := i.db.NewTxn().Query(context.Background(),
+		`{
+			interests(func: has(interest)){
+			  uid
+			  name
+			}
+		}`)
+	if err != nil {
+		return status.Errorf(codes.Unknown, err.Error())
+	}
+
+	type InterestsResp struct {
+		Interests []model.Interest `json:"interests"`
+	}
+	data := InterestsResp{}
+	// unmarshall {"interests": [{"uid": "0x1","name": "chips"},{"uid": "0x3","name": "chips"}]}
+	err = json.Unmarshal(resp.Json, &data)
+	if err != nil {
+		return status.Errorf(codes.Unknown, err.Error())
+	}
+	// try to  stream all found interests
+	for _, interest := range data.Interests {
+		s := &pb.Interest{
+			Id:   interest.UID,
+			Name: interest.Name,
+		}
+		err := stream.Send(s)
+		if err != nil {
+			return status.Errorf(codes.Unknown, err.Error())
+		}
+	}
 	return nil
 }
 
