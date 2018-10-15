@@ -44,8 +44,8 @@ func main() {
 	location: geo @index(geo) .
 	name: string @index(term) .
 	lastname: string @index(term) .
+	email: string @index(exact) @upsert .
 	password: password .
-	name: string @index(term) .
 	follows: uid @reverse .
 	interested: uid @reverse .
 	verified: bool .
