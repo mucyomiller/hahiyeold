@@ -31,7 +31,7 @@ func main() {
 	//spin up dgraph db connection
 	conn, err := grpc.Dial("127.0.0.1:9080", grpc.WithInsecure())
 	if err != nil {
-		log.Fatal("While trying to dial gRPC")
+		log.Fatal("Error Occurred While trying to dial gRPC")
 		return
 	}
 	fmt.Println("Now Connected to DgraphDB")
