@@ -29,7 +29,7 @@ const (
 func main() {
 
 	//spin up dgraph db connection
-	conn, err := grpc.Dial("127.0.0.1:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("server:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 		return
