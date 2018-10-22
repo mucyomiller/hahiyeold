@@ -2,6 +2,6 @@
 something new(project description soon... )   
 
 ### _Run project:_
-```go run main.go```   
+```docker-compose up```   
 ### _Generate protobuffer from proto file:_   
 ```protoc -I proto/ proto/hahiye.proto  --go_out=plugins=grpc:hahiye/```
