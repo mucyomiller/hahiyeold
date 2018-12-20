@@ -4,4 +4,22 @@ something new(project description soon... )
 ### _Run project:_
 ```go run main.go```   
 ### _Generate protobuffer from proto file:_   
-```protoc -I proto/ proto/hahiye.proto  --go_out=plugins=grpc:hahiye/```
+```protoc -I proto/ proto/hahiye.proto  --go_out=plugins=grpc:hahiye/```   
+## pre-requisite   
+This project depends on dgraph database   
+run dgraph DB by:   
+```shell
+$ dgraph zero
+```
+```shell
+$ dgraph server --lru_mb=2048
+```
+```shell
+$ dgraph-ratel
+```
+
+Or simply if you use Docker   
+```shell
+$ docker-compose up
+```
+
